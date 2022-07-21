@@ -1,0 +1,21 @@
+node {
+    stage('Git Checkout') {
+         checkout scm
+        }
+    stage('SonarQube Analysis') {
+        def scannerHome = tool 'SonarQube Scanner';
+        withSonarQubeEnv(credentialsId: 'admin') {
+            sh "${scannerHome}/bin/sonar-scanner \
+	    -D sonar.projectKey=python"
+        }
+    }
+    stage('test') {
+		sh 'python3 test.py'
+	}
+    stage('Generate Tesy Report') {
+			junit 'test-reports/*.xml'
+	}
+	stage ('Publish Artifactory') {
+	      sh 'jf rt upload test-reports/ python-generic-local/'
+	}
+}

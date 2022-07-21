@@ -1,26 +1,32 @@
 node {
     stage('Git Checkout') {
     }
-	stage ('Build') {
-		docker.image('python:3.7.2')
-		sh 'pip install -r requirements.txt'
-	}
+	
+	stage ('clean') {
+		/* Cleaning Workspace Stage Started */
+        bat 'rmdir /s /q test-reports'
+		
 	stage ('test') {
+	    /* Test Stage Started */
 		sh 'python3 test.py'
 	}
 	stage('SonarQube Analysis') {
+	    /* Static Code Analysis */
         def scannerHome = tool 'SonarQube Scanner';
         withSonarQubeEnv(credentialsId: 'admin') {
             sh "${scannerHome}/bin/sonar-scanner \
 	    -D sonar.projectKey=python"
         }
     }
-    stage('Generate Tesy Report') {
-			junit 'test-reports/*.xml'
+    stage('Generate Test Report') {
+		/* Generate Text Report */
+		junit 'test-reports/*.xml'
 	}
+	
 	stage ('Publish Artifactory') {
+		/* Publish Report to JFrog Artifacts */
 		withCredentials([usernamePassword(credentialsId: 'artifactory', passwordVariable: 'passwd', usernameVariable: 'user')]) {
-			sh 'jjf rt upload test-reports/ python-generic-local/'
+			sh 'jf rt upload test-reports/ python-generic-local/'
 		}
 	}
 }

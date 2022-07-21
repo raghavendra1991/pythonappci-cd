@@ -4,7 +4,7 @@ node {
 
 	stage ('clean') {
 		/* Cleaning Workspace Stage Started */
-        bat 'rmdir /s /q test-reports'
+        sh 'rmdir /s /q test-reports'
     }
 		
 	stage ('test') {

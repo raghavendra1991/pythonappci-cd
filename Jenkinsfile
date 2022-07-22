@@ -17,7 +17,7 @@ node {
         def scannerHome = tool 'SonarQube Scanner';
         withSonarQubeEnv(credentialsId: 'admin') {
             sh "${scannerHome}/bin/sonar-scanner \
-	        -D sonar.projectKey=python"
+	        -D sonar.projectKey=pythonapp"
         }
     }
     stage('Generate Test Report') {
